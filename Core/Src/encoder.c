@@ -3,10 +3,9 @@
 #include <stdint.h>
 #include "encoder.h"
 
-void Encoder_Init(TIM_HandleTypeDef *htim)
+HAL_StatusTypeDef Encoder_Init(TIM_HandleTypeDef *htim)
 {
-    HAL_TIM_Encoder_Start(htim, TIM_CHANNEL_ALL);
-    return;
+    return HAL_TIM_Encoder_Start(htim, TIM_CHANNEL_ALL);
 }
 
 static uint32_t last_tick[CHANNEL_NUMBER]={0};
