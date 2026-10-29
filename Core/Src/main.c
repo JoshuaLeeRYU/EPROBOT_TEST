@@ -24,6 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdint.h>
 #include <stdio.h>
 #include "encoder.h"
 #include "oled.h"
@@ -49,7 +50,7 @@
 
 /* USER CODE BEGIN PV */
 uint8_t clcflag =0;
-int i=0;
+uint8_t oledflag=0;
 char message[20];
 float n=0.0f,v=0.0f;
 /* USER CODE END PV */
@@ -105,8 +106,9 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim14);
-  OLED_Init();
+  A4950_Init_1_();
   Encoder_Init(&htim2);
+  OLED_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -115,16 +117,18 @@ int main(void)
   {
     if (clcflag==1) {
       clcflag = 0;
-      i++;
+      oledflag++;
       n=Get_Encoder_RPS(&htim2, 4096, 1.0f);
       v=Get_Encoder_Ang_V(&htim2, 4096, 1.0f);
     }
-    if (i==50) {
-    i=0;
+
+
+    if (oledflag==50) {
+    oledflag=0;
     OLED_NewFrame();
-    sprintf(message, "RPS=%.2fr/s",n);
-    OLED_PrintString(0, 0, message, &font16x16, OLED_COLOR_NORMAL);
-    sprintf(message, "Ang_v=%.2frad/s",v);
+
+
+    
     OLED_ShowFrame();
     }
     /* USER CODE END WHILE */
