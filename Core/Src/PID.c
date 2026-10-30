@@ -2,8 +2,8 @@
 #include <stdint.h>
 
 #define PID_CHANNEL_NUMBER 10
-
-static const float duty_max[PID_CHANNEL_NUMBER]={0.05,10,10,10,10,10,10,10,10,10};
+#define DMIN 0.0f
+static const float duty_max[PID_CHANNEL_NUMBER]={1.0f,10,10,10,10,10,10,10,10,10};
 static uint32_t last_tick[PID_CHANNEL_NUMBER] = {0};
 static float integral[PID_CHANNEL_NUMBER] = {0};
 static float last_err[PID_CHANNEL_NUMBER] = {0};
@@ -26,22 +26,22 @@ float Clc_PID_Duty(uint8_t channel,float err, float kp,float ki ,float kd)//å•ä
     if (dt_ms == 0) {
     float out = kp * err + ki * integral[channel];
     if (out > dmax) out = dmax;
-    if (out < -dmax) out = -dmax;
+    if (out < DMIN) out = DMIN;
     return out;
     }
     float dt=dt_ms*0.001f;
     float D=kd*(err-last_err[channel])/dt;
     float PID = kp * err + ki * integral[channel] + D;
     if (!((PID > dmax && err > 0) ||
-      (PID < -dmax && err < 0))) {
+      (PID < DMIN && err < 0))) {
     integral[channel] += err * dt;
     }
     
     if (PID > dmax) {
         PID = dmax;
     }
-    if (PID < -dmax) {
-        PID = -dmax;
+    if (PID < DMIN) {
+        PID = DMIN;
     }
     last_err[channel]=err;
     last_tick[channel]=now;

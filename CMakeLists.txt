@@ -76,3 +76,19 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 
     # Add user defined libraries
 )
+
+# Enable floating point support in newlib-nano's printf/sprintf family.
+# With "--specs=nano.specs", newlib-nano is built integer-only by default and
+# %f / %e / %g output nothing. Forcing this symbol pulls in nano-vfprintf_float.o.
+# Measured cost in this project: FLASH 23.3 KB -> 35.4 KB (+~12 KB).
+# Comment this out to save flash when float printing is not needed.
+target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
+    -Wl,-u,_printf_float
+)
+
+# Uncomment if scanf/sscanf with %f is also required (adds more flash):
+# target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
+#     -Wl,-u,_scanf_float
+# )
+
+

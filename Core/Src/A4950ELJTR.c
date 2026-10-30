@@ -4,7 +4,7 @@
 #include "tim.h"
 #include <stdint.h>
 
-#define _1_TIM &htim3
+#define _1_TIM (&htim3)
 #define _1_IN1 TIM_CHANNEL_3
 #define _1_IN2 TIM_CHANNEL_4
 void A4950_Init_1_()
@@ -15,8 +15,19 @@ void A4950_Init_1_()
     __HAL_TIM_SET_COMPARE(_1_TIM, _1_IN2, 0);
 }
 
-void A4950_CTRL_1_(float CCR,uint8_t way)
+static uint32_t duty_to_ccr(float duty)
 {
+    if (duty <= 0.0f) return 0;
+    if (duty >= 1.0f) return _1_TIM->Instance->ARR;
+
+    /* ARR+1 = 2000 个计数对应 100% */
+    uint32_t ccr = (uint32_t)(duty * (float)(_1_TIM->Instance->ARR + 1U) + 0.5f);
+    return (ccr > _1_TIM->Instance->ARR) ? _1_TIM->Instance->ARR : ccr;
+}
+
+void A4950_CTRL_1_(float duty,uint8_t way)
+{
+    uint32_t CCR = duty_to_ccr(duty);
 switch (way) {
     case 0:
         __HAL_TIM_SET_COMPARE(_1_TIM, _1_IN1, CCR);

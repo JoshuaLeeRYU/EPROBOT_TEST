@@ -18,8 +18,8 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "font.h"
 #include "i2c.h"
+#include "stm32f4xx_hal.h"
 #include "tim.h"
 #include "gpio.h"
 
@@ -57,6 +57,7 @@ char message[20];
 float n=0.0f,v=0.0f;
 float err=0,target=100;
 float ccr=0;
+float rps=0,duty=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -105,39 +106,47 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
-  MX_TIM2_Init();
   MX_TIM14_Init();
   MX_TIM3_Init();
+  MX_TIM1_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
+  HAL_Delay(100);
+  OLED_Init();
   HAL_TIM_Base_Start_IT(&htim14);
   A4950_Init_1_();
-  Encoder_Init(&htim2);
-  OLED_Init();
+  Encoder_Init(&htim4);
+  HAL_Delay(500);
+  A4950_CTRL_1_(0.5, 0);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    if (clcflag==1) {
-      clcflag = 0;
-      oledflag++;
-      float rps=Get_Encoder_RPS(&htim2, 52, 1);
-      err=target-rps;
-      float duty=Clc_PID_Duty(0, err, 0.1f, 0.1f, 0.1f);
-      ccr=duty*20;
-      A4950_CTRL_1_(ccr, 0);
+    // if (clcflag==1) {
+    //   clcflag = 0;
+    //   oledflag++;
+    //   rps=Get_Encoder_RPS(&htim4, 52, -1);
+    //   err=target-rps;
+    //   duty=Clc_PID_Duty(0, err, 0.01f, 0.0f, 0.0f);
+    //   A4950_CTRL_1_(duty, 0);
 
-    if (oledflag==100) {
-    oledflag=0;
-    OLED_NewFrame();
-    sprintf(message, "RPS=%.2fr/s",rps);
-    OLED_PrintString(0, 0, message, &font16x16, OLED_COLOR_NORMAL);
-    sprintf(message, "duty=%.2fr/s",duty);
-    OLED_PrintString(0, 16, message, &font16x16, OLED_COLOR_NORMAL);
-    OLED_ShowFrame();
-    }
-    }
+    // if (oledflag==50) {
+    // oledflag=0;
+    // OLED_NewFrame();
+    // sprintf(message, "RPS=%.2fr/s",rps);
+    // OLED_PrintString(0, 0, message, &font16x16, OLED_COLOR_NORMAL);
+    // sprintf(message, "duty=%.5f",duty);
+    // OLED_PrintString(0, 16, message, &font16x16, OLED_COLOR_NORMAL);
+    // OLED_ShowFrame();
+    // }
+    // }
+
+
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
