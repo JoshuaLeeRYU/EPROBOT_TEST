@@ -1,6 +1,4 @@
-#define CHANNEL_NUMBER 10
-#define PI 3.1415926f
-#define P2I 6.2831853f
+#include "main.h"
 
 HAL_StatusTypeDef Encoder_Init(TIM_HandleTypeDef *htim);
 float Get_Encoder_RPS_Excount(int32_t counter,uint8_t channel,uint32_t encoder_p,float encoder_k);

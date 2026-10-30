@@ -3,17 +3,22 @@
 #include <stdint.h>
 #include "encoder.h"
 
+#define ENCODER_CHANNEL_NUMBER 10
+#define PI 3.1415926f
+#define P2I 6.2831853f
+
+
 HAL_StatusTypeDef Encoder_Init(TIM_HandleTypeDef *htim)
 {
     return HAL_TIM_Encoder_Start(htim, TIM_CHANNEL_ALL);
 }
 
-static uint32_t last_tick[CHANNEL_NUMBER]={0};
-static int32_t last_counter[CHANNEL_NUMBER]={0};
-static uint8_t Inited[CHANNEL_NUMBER]={0};
+static uint32_t last_tick[ENCODER_CHANNEL_NUMBER]={0};
+static int32_t last_counter[ENCODER_CHANNEL_NUMBER]={0};
+static uint8_t Inited[ENCODER_CHANNEL_NUMBER]={0};
 float Get_Encoder_RPS_Excount(int32_t counter,uint8_t channel,uint32_t encoder_p,float encoder_k)  //计算转速（r/s）,外部给编码器值。encoder_p = 分辨率*倍率，encoder_k = 齿轮系数
 {
-    if(channel>=CHANNEL_NUMBER) return 0.0f;
+    if(channel>=ENCODER_CHANNEL_NUMBER) return 0.0f;
     if (Inited[channel] == 0) {
         Inited[channel] = 1;
         last_tick[channel]=HAL_GetTick();

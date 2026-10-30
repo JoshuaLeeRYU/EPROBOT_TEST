@@ -1,3 +1,4 @@
+#include "main.h"
 #include "A4950ELJTR.h"
 #include "stm32f4xx_hal_tim.h"
 #include "tim.h"

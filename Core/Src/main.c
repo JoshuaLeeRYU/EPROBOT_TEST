@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "font.h"
 #include "i2c.h"
 #include "tim.h"
 #include "gpio.h"
@@ -29,6 +30,7 @@
 #include "encoder.h"
 #include "oled.h"
 #include "A4950ELJTR.h"
+#include "PID.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,6 +55,8 @@ uint8_t clcflag =0;
 uint8_t oledflag=0;
 char message[20];
 float n=0.0f,v=0.0f;
+float err=0,target=100;
+float ccr=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -66,7 +70,7 @@ void SystemClock_Config(void);
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   if (htim == &htim14) {
     clcflag = 1;
-    // TIM14 控制标志
+    // TIM14 控制标志 500hz
   }
 }
 /* USER CODE END 0 */
@@ -118,18 +122,21 @@ int main(void)
     if (clcflag==1) {
       clcflag = 0;
       oledflag++;
-      n=Get_Encoder_RPS(&htim2, 4096, 1.0f);
-      v=Get_Encoder_Ang_V(&htim2, 4096, 1.0f);
-    }
+      float rps=Get_Encoder_RPS(&htim2, 52, 1);
+      err=target-rps;
+      float duty=Clc_PID_Duty(0, err, 0.1f, 0.1f, 0.1f);
+      ccr=duty*20;
+      A4950_CTRL_1_(ccr, 0);
 
-
-    if (oledflag==50) {
+    if (oledflag==100) {
     oledflag=0;
     OLED_NewFrame();
-
-
-    
+    sprintf(message, "RPS=%.2fr/s",rps);
+    OLED_PrintString(0, 0, message, &font16x16, OLED_COLOR_NORMAL);
+    sprintf(message, "duty=%.2fr/s",duty);
+    OLED_PrintString(0, 16, message, &font16x16, OLED_COLOR_NORMAL);
     OLED_ShowFrame();
+    }
     }
     /* USER CODE END WHILE */
 

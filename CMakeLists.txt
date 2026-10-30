@@ -37,9 +37,11 @@ add_executable(${CMAKE_PROJECT_NAME}
     Core/Src/font.c
     Core/Src/encoder.c
     Core/Src/A4950ELJTR.c
+    Core/Src/PID.c
     Core/Inc/encoder.h
     Core/Inc/font.h
     Core/Inc/oled.h
+    Core/Inc/PID.h
     Core/Inc/A4950ELJTR.h)
 
 # Add STM32CubeMX generated sources
