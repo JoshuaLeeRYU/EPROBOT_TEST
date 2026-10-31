@@ -57,7 +57,7 @@ uint8_t clcflag =0;
 uint8_t oledflag=0;
 char message[20];
 float n=0.0f,v=0.0f;
-float err=0,target=4;
+float err=0,target=2;
 float ccr=0;
 float duty=0;
 float rps=0;
@@ -119,7 +119,7 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   HAL_Delay(100);
-  // OLED_Init();
+  OLED_Init();
   HAL_TIM_Base_Start_IT(&htim14);
   A4950_Init_1_();
   Encoder_Init(&htim1);
@@ -136,12 +136,12 @@ int main(void)
     }
     if (oledflag==50) {
       oledflag=0;
-    // OLED_NewFrame();
-    // sprintf(message, "RPS=%.2fr/s",rps);
-    // OLED_PrintString(0, 0, message, &font16x16, OLED_COLOR_NORMAL);
-    // sprintf(message, "duty=%.5f",duty);
-    // OLED_PrintString(0, 16, message, &font16x16, OLED_COLOR_NORMAL);
-    // OLED_ShowFrame();
+    OLED_NewFrame();
+    sprintf(message, "RPS=%.2fr/s",rps);
+    OLED_PrintString(0, 0, message, &font16x16, OLED_COLOR_NORMAL);
+    sprintf(message, "duty=%.5f",duty);
+    OLED_PrintString(0, 16, message, &font16x16, OLED_COLOR_NORMAL);
+    OLED_ShowFrame();
     }
     for (int i=-180; i<180; i++) {
     Servo_Set_Ang(&htim2 , i);

@@ -27,4 +27,3 @@ float Get_Encoder_RPS_Fxdt(TIM_HandleTypeDef *htim,uint8_t encoder_channel,float
     last_counter[encoder_channel]=counter;
     return encoder_k*(d_counter/((dt_s)*encoder_p));
 }
-

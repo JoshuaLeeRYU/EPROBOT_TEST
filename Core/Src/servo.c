@@ -7,10 +7,10 @@
 #define DUTY_MIN 0.025f
 #define DUTY_MAX 0.125f
 #define ANG_RANGE 180
-#define SERVO_CHANNEL TIM_CHANNEL_2
+#define SERVO_CHANNEL TIM_CHANNEL_1
 void Servo_Init(TIM_HandleTypeDef *htim)
 {
-    HAL_TIM_PWM_Init(htim);
+    HAL_TIM_PWM_Start(htim, SERVO_CHANNEL);
     __HAL_TIM_SET_COMPARE(htim, SERVO_CHANNEL, 0);
     return;
 }
