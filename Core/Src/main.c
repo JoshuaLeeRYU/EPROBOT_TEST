@@ -19,6 +19,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "i2c.h"
+#include "stm32f4xx_hal.h"
+#include "stm32f4xx_hal_tim.h"
 #include "tim.h"
 #include "gpio.h"
 
@@ -30,6 +32,7 @@
 #include "oled.h"
 #include "A4950ELJTR.h"
 #include "PID.h"
+#include "servo.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,9 +57,10 @@ uint8_t clcflag =0;
 uint8_t oledflag=0;
 char message[20];
 float n=0.0f,v=0.0f;
-float err=0,target=50;
+float err=0,target=4;
 float ccr=0;
-float rps=0,duty=0;
+float duty=0;
+float rps=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -70,7 +74,11 @@ void SystemClock_Config(void);
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   if (htim == &htim14) {
     clcflag = 1;
-    // TIM14 控制标志 500hz
+      rps=Get_Encoder_RPS_Fxdt(&htim1,0, 0.02f,52, 0.035714f);
+      err=target-rps;
+      duty=Clc_PID_Duty(0, 0.02f, err, 0.6f, 1.2f, 0.001f);
+      A4950_CTRL_1_(duty, 1);
+    // TIM14 控制标志 50hz
   }
 }
 /* USER CODE END 0 */
@@ -108,15 +116,14 @@ int main(void)
   MX_TIM14_Init();
   MX_TIM3_Init();
   MX_TIM1_Init();
-  MX_TIM4_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   HAL_Delay(100);
-  OLED_Init();
+  // OLED_Init();
   HAL_TIM_Base_Start_IT(&htim14);
   A4950_Init_1_();
   Encoder_Init(&htim1);
-  HAL_Delay(500);
-
+  Servo_Init(&htim2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -126,23 +133,20 @@ int main(void)
     if (clcflag==1) {
       clcflag = 0;
       oledflag++;
-      rps=Get_Encoder_RPS(&htim1, 52, -1);
-      err=target-rps;
-      duty=Clc_PID_Duty(0, err, 0.1f, 0.05f, 0.0f);
-      A4950_CTRL_1_(duty, 0);
-
+    }
     if (oledflag==50) {
-    oledflag=0;
-    OLED_NewFrame();
-    sprintf(message, "RPS=%.2fr/s",rps);
-    OLED_PrintString(0, 0, message, &font16x16, OLED_COLOR_NORMAL);
-    sprintf(message, "duty=%.5f",duty);
-    OLED_PrintString(0, 16, message, &font16x16, OLED_COLOR_NORMAL);
-    OLED_ShowFrame();
+      oledflag=0;
+    // OLED_NewFrame();
+    // sprintf(message, "RPS=%.2fr/s",rps);
+    // OLED_PrintString(0, 0, message, &font16x16, OLED_COLOR_NORMAL);
+    // sprintf(message, "duty=%.5f",duty);
+    // OLED_PrintString(0, 16, message, &font16x16, OLED_COLOR_NORMAL);
+    // OLED_ShowFrame();
     }
+    for (int i=-180; i<180; i++) {
+    Servo_Set_Ang(&htim2 , i);
+    HAL_Delay(10);
     }
-
-
 
 
     /* USER CODE END WHILE */

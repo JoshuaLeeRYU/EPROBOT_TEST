@@ -17,12 +17,10 @@ void A4950_Init_1_()
 
 static uint32_t duty_to_ccr(float duty)
 {
+    uint32_t arr = __HAL_TIM_GET_AUTORELOAD(_1_TIM);
     if (duty <= 0.0f) return 0;
-    if (duty >= 1.0f) return _1_TIM->Instance->ARR;
-
-    /* ARR+1 = 2000 个计数对应 100% */
-    uint32_t ccr = (uint32_t)(duty * (float)(_1_TIM->Instance->ARR + 1U) + 0.5f);
-    return (ccr > _1_TIM->Instance->ARR) ? _1_TIM->Instance->ARR : ccr;
+    uint32_t ccr = (uint32_t)(duty * (float)(arr + 1) + 0.5f);
+    return (ccr > arr + 1) ? (arr + 1) : ccr;
 }
 
 void A4950_CTRL_1_(float duty,uint8_t way)
