@@ -57,7 +57,7 @@ uint8_t clcflag =0;
 uint8_t oledflag=0;
 char message[20];
 float n=0.0f,v=0.0f;
-float err=0,target=4;
+float err=0,target=1;
 float ccr=0;
 float duty=0;
 float rps=0;
@@ -128,7 +128,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    if (oledflag==50) {
+    if (oledflag==150) {
       oledflag=0;
     // OLED_NewFrame();
     // sprintf(message, "RPS=%.2fr/s",rps);
@@ -136,6 +136,10 @@ int main(void)
     // sprintf(message, "duty=%.5f",duty);
     // OLED_PrintString(0, 16, message, &font16x16, OLED_COLOR_NORMAL);
     // OLED_ShowFrame();
+    target+=1;
+    if (target>=5) {
+    target=1;
+    }
   }
     /* USER CODE END WHILE */
 
