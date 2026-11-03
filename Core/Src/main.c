@@ -28,6 +28,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "encoder.h"
 #include "oled.h"
 #include "A4950ELJTR.h"
@@ -57,10 +58,11 @@ uint8_t clcflag =0;
 uint8_t oledflag=0;
 char message[20];
 float n=0.0f,v=0.0f;
-float err=0,target=2;
+float err=0,target=4;
 float ccr=0;
 float duty=0;
 float rps=0;
+int16_t servo_angle=-180;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -73,12 +75,12 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   if (htim == &htim14) {
-    clcflag = 1;
+      oledflag++;
       rps=Get_Encoder_RPS_Fxdt(&htim1,0, 0.02f,52, 0.035714f);
       err=target-rps;
       duty=Clc_PID_Duty(0, 0.02f, err, 0.6f, 1.2f, 0.001f);
       A4950_CTRL_1_(duty, 1);
-    // TIM14 控制标志 50hz
+    // TIM14 控制 50hz
   }
 }
 /* USER CODE END 0 */
@@ -130,10 +132,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    if (clcflag==1) {
-      clcflag = 0;
-      oledflag++;
-    }
     if (oledflag==50) {
       oledflag=0;
     OLED_NewFrame();
@@ -141,14 +139,15 @@ int main(void)
     OLED_PrintString(0, 0, message, &font16x16, OLED_COLOR_NORMAL);
     sprintf(message, "duty=%.5f",duty);
     OLED_PrintString(0, 16, message, &font16x16, OLED_COLOR_NORMAL);
+    sprintf(message, "servo_ang=%d", servo_angle);
+    OLED_PrintString(0, 32, message, &font16x16, OLED_COLOR_NORMAL);
     OLED_ShowFrame();
+    Servo_Set_Ang(&htim2 , abs(servo_angle));
+    servo_angle+=10;
+    if (servo_angle>=180) {
+      servo_angle=-180;
     }
-    for (int i=-180; i<180; i++) {
-    Servo_Set_Ang(&htim2 , i);
-    HAL_Delay(10);
-    }
-
-
+  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
