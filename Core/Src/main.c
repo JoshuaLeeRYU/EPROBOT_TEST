@@ -76,7 +76,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
       oledflag++;
       rps=Get_Encoder_RPS_Fxdt(&htim1,0, 0.02f,52, 0.035714f);
       err=target-rps;
-      duty=Clc_PID_Duty(0, 0.02f, err, 0.3f, 0.8f, 0.001f);     //Duty变化速率太大会导致芯片限流？？
+      duty=Clc_PID_Duty(0, 0.02f, err, 0.3f, 0.8f, 0.001f);     //Duty变化速率太大会导致芯片限流？？紫色板子似乎没问题
       A4950_CTRL_1_(duty, 1);
     // TIM14 控制 50hz
   }
