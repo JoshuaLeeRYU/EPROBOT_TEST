@@ -4,7 +4,7 @@
 #define PID_CHANNEL_NUMBER 10
 #define DMIN 0.0f
 
-static const float d_max[PID_CHANNEL_NUMBER]={0.9999f,10,10,10,10,10,10,10,10,10};
+static const float d_max[PID_CHANNEL_NUMBER]={0.97f,10,10,10,10,10,10,10,10,10};
 static float integral[PID_CHANNEL_NUMBER] = {0};
 static float last_err[PID_CHANNEL_NUMBER] = {0};
 static uint8_t inited[PID_CHANNEL_NUMBER]={0};
